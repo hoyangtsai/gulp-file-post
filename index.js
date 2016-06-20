@@ -77,7 +77,7 @@ module.exports = function(options) {
             return err;
           }
           if (resp.statusCode === 200) {
-            gutil.log(green(this.filePath, " => ", this.destPath, ", SUCCESS!"));
+            gutil.log(green(filePath, " => ", destPath, ", SUCCESS!"));
             cb(null);
           }
         });
