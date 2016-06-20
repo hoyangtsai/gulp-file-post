@@ -12,7 +12,7 @@ const PLUGIN_NAME = 'gulp-file-post';
 
 module.exports = function(options) {
   if (options.constructor !== Object) {
-    throw new PluginError(PLUGIN_NAME, 'Parameter not a object.');
+    throw new PluginError(PLUGIN_NAME, 'Parameter not an object.');
   }
   if (!options.hasOwnProperty('url') || !options.hasOwnProperty('destDir')) {
     throw new PluginError(PLUGIN_NAME, 'Missing field.');
@@ -20,8 +20,7 @@ module.exports = function(options) {
 
   return through.obj(function(file, enc, cb) {
     if (file.isStream()) {
-      this.emit('error', new PluginError(PLUGIN_NAME, 'Streaming not supported'));
-      return;
+      throw new PluginError(PLUGIN_NAME, 'Streaming not supported.');
     }
     if (file.isNull() || file.isDirectory()) {
       cb(null);
@@ -41,19 +40,26 @@ module.exports = function(options) {
           if (key == 'url' || key == 'destDir') continue;
           formData[key] = options[key];
         }
-        request.post({url: options.url, formData: formData}, function (err, resp, body) {
+        request.post({url: options.url, formData: formData}, function(err, resp, body) {
           if (err) {
-            throw new PluginError(PLUGIN_NAME, 'Upload failed: ', err);
+            gutil.log(red('file: ', filePath));
+            gutil.log(red(err));
+            this.emit('error', new PluginError(PLUGIN_NAME, 'Upload Failed.'));
+            return err;
           }
-          gutil.log(green('Upload successed!'));
+          if (resp.statusCode === 200) {
+            gutil.log(green('Upload successed!'));
+            cb(null);
+          }
         });
       } else {
+        // get local project root
         var dirname = path.resolve(__dirname, '../..', 'publish');
-
         var regexp = new RegExp('[\\s\\S]*' + dirname + '[\\/]?');
         var relPath = path.dirname(filePath.replace(/\\+/g, '\/')).replace(regexp, '') + '/';
 
-        var destPath = options.destDir + '/' + relPath;
+        // assemble destDir + file root + file name
+        var destPath = options.destDir + '/' + relPath + path.basename(filePath);
 
         var formData = {
           to: destPath,
@@ -63,14 +69,19 @@ module.exports = function(options) {
           if (key == 'url' || key == 'destDir') continue;
           formData[key] = options[key];
         }
-        request.post({url: options.url, formData: formData}, function (err, resp, body) {
+        request.post({url: options.url, formData: formData}, function(err, resp, body) {
           if (err) {
-            gutil.log(red('err : ', err));
+            gutil.log(red('file: ', filePath));
+            gutil.log(red(err));
+            this.emit('error', new PluginError(PLUGIN_NAME, 'Upload Failed.'));
+            return err;
           }
-          gutil.log(green(filePath, " => ", destPath, ", SUCCESS!"));
+          if (resp.statusCode === 200) {
+            gutil.log(green(this.filePath, " => ", this.destPath, ", SUCCESS!"));
+            cb(null);
+          }
         });
       }
-      cb(null);
     }
   });
 };
