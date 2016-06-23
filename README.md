@@ -31,6 +31,7 @@ name | type | description
 --- | --- | --- 
 url | string | remote server receiver
 destDir | string | upload file destination
+{any names} | {any types} | any customized names for formdata field except url and destDir
 
 ## License
 
