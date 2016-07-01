@@ -18,16 +18,20 @@ module.exports = function(options) {
     throw new PluginError(PLUGIN_NAME, 'Missing field.');
   }
 
+  var folders = [];
+
   return through.obj(function(file, enc, cb) {
     if (file.isStream()) {
       throw new PluginError(PLUGIN_NAME, 'Streaming not supported.');
     }
+
+    var filePath = file.path;
     if (file.isNull() || file.isDirectory()) {
+      folders.push(filePath);
       cb(null);
     }
 
     if (file.isBuffer()) {
-      var filePath = file.path;
       var fileExt = path.extname(filePath).substring(1);
 
       if (fileExt === 'zip') {
@@ -53,9 +57,11 @@ module.exports = function(options) {
           }
         });
       } else {
+        // directory based on gulpfile.js
+        // var dirname = path.dirname(module.parent.id) + '/publish';
+
         // get local project root
-        var dirname = path.resolve(__dirname, '../..', 'publish');
-        var regexp = new RegExp('[\\s\\S]*' + dirname + '[\\/]?');
+        var regexp = new RegExp('[\\s\\S]*' + folders[0] + '[\\/]?');
         var relPath = path.dirname(filePath.replace(/\\+/g, '\/')).replace(regexp, '') + '/';
 
         // assemble destDir + file root + file name
