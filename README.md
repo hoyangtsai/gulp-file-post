@@ -30,8 +30,8 @@ gulp.task('upload', function() {
 name | type | description
 --- | --- | --- 
 url | string | remote server receiver
-destDir | string | field of upload file destination in the formdata
-{other names} | {any types} | field of other customized names in the formdata except url and destDir
+root | string | relative host path while multiple files upload
+data | object | object of the formdata in the request body
 
 ## License
 

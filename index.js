@@ -11,80 +11,83 @@ var path = require('path');
 const PLUGIN_NAME = 'gulp-file-post';
 
 module.exports = function(options) {
-  if (options.constructor !== Object) {
+  if (!options instanceof Object) {
     throw new PluginError(PLUGIN_NAME, 'Parameter not an object.');
   }
-  if (!options.hasOwnProperty('url') || !options.hasOwnProperty('destDir')) {
-    throw new PluginError(PLUGIN_NAME, 'Missing field.');
-  }
 
-  var folders = [];
+  function handleErr(errMsg) {
+    errMsg.forEach(function(msg, i) {
+      gutil.log(red(msg));
+    });
+    this.emit('error', new PluginError(PLUGIN_NAME, 'Upload Failed.'));
+    return;
+  }
 
   return through.obj(function(file, enc, cb) {
     if (file.isStream()) {
       throw new PluginError(PLUGIN_NAME, 'Streaming not supported.');
     }
 
-    var filePath = file.path;
     if (file.isNull() || file.isDirectory()) {
-      folders.push(filePath);
-      cb(null);
+      cb(null, file);
     }
 
     if (file.isBuffer()) {
+      var filePath = file.path;
       var fileExt = path.extname(filePath).substring(1);
 
       if (fileExt === 'zip') {
-        var formData = {
-          to: options.destDir,
-          type: fileExt,
-          file: fs.createReadStream(filePath)
-        };
-        for (var key in options) {
-          if (key == 'url' || key == 'destDir') continue;
-          formData[key] = options[key];
-        }
+        var formData = options.data;
+        formData['file'] = fs.createReadStream(filePath);
+        formData['type'] = fileExt;
+
         request.post({url: options.url, formData: formData}, function(err, resp, body) {
           if (err) {
-            gutil.log(red('file: ', filePath));
-            gutil.log(red(err));
-            this.emit('error', new PluginError(PLUGIN_NAME, 'Upload Failed.'));
-            return err;
+            var errMsg = [ 'file : ' + filePath, err ];
+            handleErr.call(this, errMsg);
           }
           if (resp.statusCode === 200) {
-            gutil.log(green('Upload successed!'));
-            cb(null);
+            gutil.log(green(filePath, 'uploaded successfully.'));
+            cb(null, file);
+          } else {
+            var errMsg = [ 'statusCode: ' + resp.statusCode, 'statusMessage: ' + resp.statusMessage];
+            handleErr.call(this, errMsg);
+            return;
           }
         });
       } else {
-        // directory based on gulpfile.js
-        // var dirname = path.dirname(module.parent.id) + '/publish';
+        // get absolute publish root
+        var dirname =  options.root ?
+          path.resolve(path.dirname(module.parent.id), options.root) :
+          path.dirname(module.parent.id);
 
-        // get local project root
-        var regexp = new RegExp('[\\s\\S]*' + folders[0] + '[\\/]?');
+        // get relative root
+        var regexp = new RegExp('[\\s\\S]*' + dirname + '[\\/]?');
         var relPath = path.dirname(filePath.replace(/\\+/g, '\/')).replace(regexp, '') + '/';
 
-        // assemble destDir + file root + file name
-        var destPath = options.destDir + '/' + relPath + path.basename(filePath);
+        // assemble remote path = to + relative root + file name
+        var destPath = options.data.to + '/' + relPath + path.basename(filePath);
 
-        var formData = {
-          to: destPath,
-          file: fs.createReadStream(filePath)
-        };
-        for (var key in options) {
-          if (key == 'url' || key == 'destDir') continue;
-          formData[key] = options[key];
-        }
+        var formData = options.data;
+        formData['file'] = fs.createReadStream(filePath);
+        formData['to'] = destPath;
+
         request.post({url: options.url, formData: formData}, function(err, resp, body) {
           if (err) {
-            gutil.log(red('file: ', filePath));
-            gutil.log(red(err));
-            this.emit('error', new PluginError(PLUGIN_NAME, 'Upload Failed.'));
-            return err;
+            var errMsg = [ 'file : ' + filePath, err ];
+            handleErr.call(this, errMsg);
           }
           if (resp.statusCode === 200) {
-            gutil.log(green(filePath, " => ", destPath, ", SUCCESS!"));
-            cb(null);
+            gutil.log(green(filePath, "=>", destPath, ", SUCCESS!"));
+            cb(null, file);
+          } else {
+            var errMsg = [
+              'file: ' + filePath,
+              'statusCode: ' + resp.statusCode,
+              'statusMessage: ' + resp.statusMessage
+            ];
+            handleErr.call(this, errMsg);
+            return;
           }
         });
       }
