@@ -37,7 +37,7 @@ module.exports = function(options) {
       var fileExt = path.extname(filePath).substring(1);
 
       if (fileExt === 'zip') {
-        var formData = options.data;
+        var formData = options.data || {};
         formData['file'] = fs.createReadStream(filePath);
         formData['type'] = fileExt;
 
@@ -66,9 +66,9 @@ module.exports = function(options) {
         var relPath = path.dirname(filePath.replace(/\\+/g, '\/')).replace(regexp, '') + '/';
 
         // assemble remote path = to + relative root + file name
-        var destPath = options.data.to + '/' + relPath + path.basename(filePath);
+        var destPath = options.remotePath + '/' + relPath + path.basename(filePath);
 
-        var formData = options.data;
+        var formData = options.data || {};
         formData['file'] = fs.createReadStream(filePath);
         formData['to'] = destPath;
 
