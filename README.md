@@ -14,11 +14,25 @@ npm install --save-dev gulp-file-post
 var gulp = require('gulp');
 var upload = require('gulp-file-post');
 
+// upload a zip file and decompress on the server
 gulp.task('upload', function() {
   return gulp.src('./publish.zip')
     .pipe(upload({
       url: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
-      destDir: '/data/wapstatic/keithytsai/open_zc'
+      data: {
+        to: '/data/wapstatic/keithytsai/open_zc'
+      }
+    })
+  );
+});
+
+// upload multiple files
+gulp.task('uploadCss', function() {
+  return gulp.src('./publish/css/**/*')
+    .pipe(upload({
+      url: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
+      root: 'publish',
+      remotePath: '/data/wapstatic/keithytsai/open_zc'
     })
   );
 });
