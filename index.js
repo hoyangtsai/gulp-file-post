@@ -45,6 +45,7 @@ module.exports = function(options) {
           if (err) {
             var errMsg = [ 'file : ' + filePath, err ];
             handleErr.call(this, errMsg);
+            return;
           }
           if (resp.statusCode === 200) {
             gutil.log(green(filePath, 'uploaded successfully.'));
@@ -76,6 +77,7 @@ module.exports = function(options) {
           if (err) {
             var errMsg = [ 'file : ' + filePath, err ];
             handleErr.call(this, errMsg);
+            return;
           }
           if (resp.statusCode === 200) {
             gutil.log(green(filePath, "=>", destPath, ", SUCCESS!"));
