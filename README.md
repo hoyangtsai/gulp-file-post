@@ -18,9 +18,9 @@ var upload = require('gulp-file-post');
 gulp.task('upload', function() {
   return gulp.src('./publish.zip')
     .pipe(upload({
-      url: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
+      url: 'http://example.com/receiver.php',
       data: {
-        to: '/data/wapstatic/keithytsai/open_zc'
+        to: '/path/file/goes'
       }
     })
   );
@@ -30,13 +30,12 @@ gulp.task('upload', function() {
 gulp.task('uploadCss', function() {
   return gulp.src('./publish/css/**/*')
     .pipe(upload({
-      url: 'http://wapstatic.kf0309.3g.qq.com/receiver/receiver2.php',
+      url: 'http://example.com/receiver.php',
       root: 'publish',
-      remotePath: '/data/wapstatic/keithytsai/open_zc'
+      remotePath: '/path/file/goes'
     })
   );
 });
-
 ```
 
 ### options
