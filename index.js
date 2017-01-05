@@ -41,19 +41,29 @@ module.exports = function(options) {
         formData['file'] = fs.createReadStream(filePath);
         formData['type'] = fileExt;
 
-        request.post({url: options.url, formData: formData}, function(err, resp, body) {
+        var reqData = {
+          formData: formData
+        };
+        if (options.timeout) {
+          reqData['timeout'] = options.timeout;
+        }
+
+        request.post(options.url, reqData, function(err, resp, body) {
           if (err) {
-            var errMsg = [ 'file : ' + filePath, err ];
+            var errMsg = ['file: ' + filePath, err];
             handleErr.call(this, errMsg);
-            return;
           }
-          if (resp.statusCode === 200) {
-            gutil.log(green(filePath, 'uploaded successfully.'));
-            cb(null, file);
-          } else {
-            var errMsg = [ 'statusCode: ' + resp.statusCode, 'statusMessage: ' + resp.statusMessage];
-            handleErr.call(this, errMsg);
-            return;
+          if (resp) {
+            if (resp.statusCode === 200) {
+              gutil.log(green(filePath, 'uploaded successfully.'));
+              cb(null, file);
+            } else {
+              var errMsg = [ 'statusCode: ' + resp.statusCode, 'statusMessage: ' + resp.statusMessage];
+              handleErr.call(this, errMsg);
+            }
+          }
+          if (options.callback) {
+            options.callback();
           }
         });
       } else {
@@ -73,23 +83,33 @@ module.exports = function(options) {
         formData['file'] = fs.createReadStream(filePath);
         formData['to'] = destPath;
 
-        request.post({url: options.url, formData: formData}, function(err, resp, body) {
+        var reqData = {
+          formData: formData
+        };
+        if (options.timeout) {
+          reqData['timeout'] = options.timeout;
+        }
+
+        request.post(options.url, reqData, function(err, resp, body) {
           if (err) {
-            var errMsg = [ 'file : ' + filePath, err ];
+            var errMsg = ['file: ' + filePath, err];
             handleErr.call(this, errMsg);
-            return;
           }
-          if (resp.statusCode === 200) {
-            gutil.log(green(filePath, "=>", destPath, ", SUCCESS!"));
-            cb(null, file);
-          } else {
-            var errMsg = [
-              'file: ' + filePath,
-              'statusCode: ' + resp.statusCode,
-              'statusMessage: ' + resp.statusMessage
-            ];
-            handleErr.call(this, errMsg);
-            return;
+          if (resp) {
+            if (resp.statusCode === 200) {
+              gutil.log(green(filePath, '=>', destPath, ', SUCCESS!'));
+              cb(null, file);
+            } else {
+              var errMsg = [
+                'file: ' + filePath,
+                'statusCode: ' + resp.statusCode,
+                'statusMessage: ' + resp.statusMessage
+              ];
+              handleErr.call(this, errMsg);
+            }
+          }
+          if (options.callback) {
+            options.callback();
           }
         });
       }
