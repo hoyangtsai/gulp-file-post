@@ -45,14 +45,14 @@ gulp.task('uploadCss', function() {
 
 ### options
 
-name | type | description
---- | --- | --- 
-url | string | remote server receiver
-root | string | based root to assemble remote path while uploading multiple files
+name | type | description | required
+--- | --- | --- | ---
+url | string | remote server receiver | ✔
+root | string | based root to assemble remote path while uploading multiple files | ✔
 remotePath | string | remote relative path while uploading multiple files
-data | object | object of the formdata in the request body
-timeout | number | integer containing the number of milliseconds to wait for a server to send response headers
-callback | object | callback function
+data | object | object of a formdata | ✔
+timeout | number | integer of milliseconds to wait for server responding | ✘
+callback | object | callback function | ✘
 
 ## License
 
