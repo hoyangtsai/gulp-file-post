@@ -26,9 +26,9 @@ function gulpFilePost(options) {
 
     if (file.isBuffer()) {
       var filePath = file.path;
-      var fileExt = path.extname(filePath);
+      var fileExt = path.extname(filePath).substring(1);
 
-      if (fileExt === '.zip') {
+      if (fileExt === 'zip') {
         var formData = options.data || {};
         formData['file'] = fs.createReadStream(filePath);
         formData['type'] = fileExt;
