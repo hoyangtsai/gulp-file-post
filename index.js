@@ -109,7 +109,7 @@ function gulpFilePost(options) {
                 message: resp.statusMessage
               };
               Object.keys(respMsg).map(function(key) {
-                gutil.log(red(key,':',respMsg[key]));
+                gutil.log(red(key, ':', respMsg[key]));
               });
               return cb(new PluginError(PLUGIN_NAME, respMsg));
             }
