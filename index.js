@@ -49,15 +49,16 @@ function gulpFilePost(options) {
           }
           if (resp) {
             if (resp.statusCode === 200) {
-              gutil.log(green(filePath, 'uploaded successfully.'));
+              gutil.log(green(filePath, 'upload successfully!'));
               cb(null, file);
             } else {
-              var respMsg = [
-                'statusCode: ' + resp.statusCode, 
-                'statusMessage: ' + resp.statusMessage
-              ];
-              respMsg.forEach(function(msg) {
-                gutil.log(red(msg));
+              var respMsg = {
+                file: filePath,
+                code: resp.statusCode,
+                message: resp.statusMessage
+              };
+              Object.keys(respMsg).map(function(key) {
+                gutil.log(red(key, ':', respMsg[key]));
               });
               return cb(new PluginError(PLUGIN_NAME, respMsg));
             }
@@ -99,16 +100,16 @@ function gulpFilePost(options) {
           }
           if (resp) {
             if (resp.statusCode === 200) {
-              gutil.log(green(filePath, '=>', destPath, ', SUCCESS!'));
+              gutil.log(green(filePath, '=>', destPath + '.', 'SUCCESS!'));
               cb(null, file);
             } else {
-              var respMsg = [
-                'file: ' + filePath,
-                'statusCode: ' + resp.statusCode,
-                'statusMessage: ' + resp.statusMessage
-              ];
-              respMsg.forEach(function(msg) {
-                gutil.log(red(msg));
+              var respMsg = {
+                file: filePath,
+                code: resp.statusCode,
+                message: resp.statusMessage
+              };
+              Object.keys(respMsg).map(function(key) {
+                gutil.log(red(key,':',respMsg[key]));
               });
               return cb(new PluginError(PLUGIN_NAME, respMsg));
             }
