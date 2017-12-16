@@ -1,11 +1,14 @@
 # gulp-file-post
 
+[![npm](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/gulp-file-post)
+[![npm](https://img.shields.io/npm/dm/localeval.svg)](https://www.npmjs.com/package/gulp-file-post)
+
 > Upload file to remote server via http post.
 
 ## Install
 
 ```
-npm install --save-dev gulp-file-post
+npm install gulp-file-post
 ```
 
 ## Example
@@ -23,11 +26,12 @@ gulp.task('upload', function() {
       data: {
         to: '/path/file/goes'
       },
-      callback: function() {
-        del.sync('dest.zip');
-      },
       timeout: 10000
-    })
+    }).on('error', function(err) {
+      // catch error message
+    }).on('end', function(){
+      // do something else
+    });
   );
 });
 
@@ -38,7 +42,11 @@ gulp.task('uploadCss', function() {
       url: 'http://example.com/receiver.php',
       root: 'dest',
       remotePath: '/path/file/goes'
-    })
+    }).on('error', function(err) {
+      // catch error message
+    }).on('end', function(){
+      // do something else
+    });
   );
 });
 ```
