@@ -1,7 +1,7 @@
 # gulp-file-post
 
-[![npm](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/gulp-file-post)
-[![npm](https://img.shields.io/npm/dm/localeval.svg)](https://www.npmjs.com/package/gulp-file-post)
+[![npm](https://img.shields.io/npm/v/gulp-file-post.svg)](https://www.npmjs.com/package/gulp-file-post)
+[![npm](https://img.shields.io/npm/dm/gulp-file-post.svg)](https://www.npmjs.com/package/gulp-file-post)
 
 > Upload file to remote server via http post.
 
